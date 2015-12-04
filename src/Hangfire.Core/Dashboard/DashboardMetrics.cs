@@ -40,6 +40,7 @@ namespace Hangfire.Dashboard
             AddMetric(FailedCount);
             AddMetric(DeletedCount);
             AddMetric(AwaitingCount);
+            AddMetric(ManualCount);
         }
 
         public static void AddMetric([NotNull] DashboardMetric metric)
@@ -189,5 +190,10 @@ namespace Hangfire.Dashboard
                     Style = awaitingCount > 0 ? MetricStyle.Info : MetricStyle.Default
                 };
             });
+
+        public static readonly DashboardMetric ManualCount = new DashboardMetric(
+            "manual:count",
+            "Manual Jobs",
+            page => new Metric(page.Statistics.Manual.ToString("N0")));
     }
 }

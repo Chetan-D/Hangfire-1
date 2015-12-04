@@ -48,6 +48,12 @@ namespace Hangfire.SqlServer
                 GetNumberOfJobsByStateName(connection, ScheduledState.StateName));
         }
 
+        public long ManualCount()
+        {
+            return UseConnection(connection =>
+                GetNumberOfJobsByStateName(connection, ManualState.StateName));
+        }
+
         public long EnqueuedCount(string queue)
         {
             var queueApi = GetQueueApi(queue);
@@ -102,6 +108,19 @@ namespace Hangfire.SqlServer
                     EnqueueAt = JobHelper.DeserializeDateTime(stateData["EnqueueAt"]),
                     ScheduledAt = JobHelper.DeserializeDateTime(stateData["ScheduledAt"])
                 }));
+        }
+
+        public JobList<ManualJobDto> ManualJobs(int @from, int count)
+        {
+            return UseConnection(connection => GetJobs(
+               connection,
+               from, count,
+               ManualState.StateName,
+               (sqlJob, job, stateData) => new ManualJobDto
+               {
+                   Job = job,
+                   CreatedAt = JobHelper.DeserializeDateTime(stateData["CreatedAt"])                   
+               }));
         }
 
         public IDictionary<DateTime, long> SucceededByDatesCount()
@@ -323,6 +342,7 @@ select sum(s.[Value]) from (
     select [Value] from [{0}].AggregatedCounter where [Key] = N'stats:deleted'
 ) as s;
 select count(*) from [{0}].[Set] where [Key] = N'recurring-jobs';
+select count(Id) from [{0}].Job where StateName = N'Manual';
 ", _storage.GetSchemaName());
 
             var statistics = UseConnection(connection =>
@@ -341,6 +361,7 @@ select count(*) from [{0}].[Set] where [Key] = N'recurring-jobs';
                     stats.Deleted = multi.Read<long?>().SingleOrDefault() ?? 0;
 
                     stats.Recurring = multi.Read<int>().Single();
+                    stats.Manual = multi.Read<int>().Single();
                 }
                 return stats;
             });

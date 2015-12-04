@@ -107,6 +107,42 @@ namespace Hangfire
         }
 
         /// <summary>
+        /// Creates a new manual job based on a given method call expression.
+        /// </summary>
+        /// <param name="methodCall">Method call expression that will be marshalled to a server.</param>
+        /// <returns>Unique identifier of a background job.</returns>
+        /// 
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="methodCall"/> is <see langword="null"/>.
+        /// </exception>
+        /// 
+        /// <seealso cref="ManualState"/>
+        /// <seealso cref="O:Hangfire.IBackgroundJobClient.Stash"/>
+        public static string Stash([NotNull, InstantHandle] Expression<Action> methodCall)
+        {
+            var client = ClientFactory();
+            return client.Stash(methodCall);
+        }
+
+        /// <summary>
+        /// Creates a new manual job based on a given method call expression.
+        /// </summary>
+        /// <param name="methodCall">Method call expression that will be marshalled to a server.</param>
+        /// <returns>Unique identifier of a background job.</returns>
+        /// 
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="methodCall"/> is <see langword="null"/>.
+        /// </exception>
+        /// 
+        /// <seealso cref="ManualState"/>
+        /// <seealso cref="O:Hangfire.IBackgroundJobClient.Stash"/>
+        public static string Stash<T>([NotNull, InstantHandle] Expression<Action<T>> methodCall)
+        {
+            var client = ClientFactory();
+            return client.Stash(methodCall);
+        }
+
+        /// <summary>
         /// Creates a new background job based on a specified static method
         /// call expression and schedules it to be enqueued after a given delay.
         /// </summary>
