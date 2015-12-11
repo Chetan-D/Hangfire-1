@@ -143,7 +143,7 @@ namespace Hangfire.Dashboard
             Routes.AddRazorPage("/jobs/manual", x => new ManualJobsPage());
             Routes.AddClientBatchCommand("/jobs/manual/trigger", (client, jobId) => client.ChangeState(
                 jobId, new EnqueuedState(), ManualState.StateName));
-            Routes.AddClientBatchCommand("/jobs/awaiting/delete", (client, jobId) => client.ChangeState(
+            Routes.AddClientBatchCommand("/jobs/manual/delete", (client, jobId) => client.ChangeState(
                 jobId, new DeletedState(), ManualState.StateName));
 
             Routes.AddCommand(
